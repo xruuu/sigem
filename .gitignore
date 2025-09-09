@@ -1,14 +1,15 @@
-# Dependencias
+# Dependencias / build
 node_modules/
 .next/
 dist/
 coverage/
+out/
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Sistema
+# SO / editor
 .DS_Store
 Thumbs.db

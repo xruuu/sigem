@@ -1,0 +1,81 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model NaveNodriza {
+  id               String      @id
+  nombre           String
+  aeronavesOrigen  Aeronave[]  @relation("OrigenNave")
+  aeronavesDestino Aeronave[]  @relation("DestinoNave")
+
+  @@map("nave_nodriza")
+}
+
+model Aeronave {
+  id               String   @id
+  nombre           String
+  maximoMarcianos  Int
+  origenId         String
+  destinoId        String
+
+  origen           NaveNodriza @relation("OrigenNave", fields: [origenId], references: [id])
+  destino          NaveNodriza @relation("DestinoNave", fields: [destinoId], references: [id])
+  pasajeros        PasajeroAeronave[]
+  revisiones       Revision[]
+
+  @@map("aeronave")
+}
+
+model Pasajero {
+  id            String @id
+  nombre        String
+  asignaciones  PasajeroAeronave[]   // ya existía
+  revisiones    RevisionPasajero[]   // <-- añade este lado opuesto
+
+  @@map("pasajero")
+}
+
+
+model PasajeroAeronave {
+  id          String   @id @default(cuid())
+  pasajeroId  String
+  aeronaveId  String
+  fechaSubida DateTime @default(now())
+  fechaBajada DateTime?
+
+  pasajero    Pasajero @relation(fields: [pasajeroId], references: [id])
+  aeronave    Aeronave @relation(fields: [aeronaveId], references: [id])
+
+  @@unique([pasajeroId, aeronaveId])
+  @@map("pasajero_aeronave")
+}
+
+model Revision {
+  id            String   @id
+  nombreRevisor String
+  aeronaveId    String
+  fecha         DateTime
+
+  aeronave      Aeronave @relation(fields: [aeronaveId], references: [id])
+  pasajeros     RevisionPasajero[]
+
+  @@unique([aeronaveId, fecha])
+  @@map("revision")
+}
+
+model RevisionPasajero {
+  id          String   @id @default(cuid())
+  revisionId  String
+  pasajeroId  String
+
+  revision    Revision @relation(fields: [revisionId], references: [id])
+  pasajero    Pasajero @relation(fields: [pasajeroId], references: [id])
+
+  @@unique([revisionId, pasajeroId])
+  @@map("revision_pasajero")
+}

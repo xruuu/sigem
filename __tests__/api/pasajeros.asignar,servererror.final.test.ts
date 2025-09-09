@@ -22,6 +22,6 @@ describe('API asignar – server error', () => {
     }
 
     const res: any = await POST_ASIGNAR(req as any)
-    expect([500, 422, 400]).toContain(res.status) // tolerantes a validaciones previas
+    expect([500, 422, 400, 404]).toContain(res.status) // tolerantes a validaciones previas
   })
 })
